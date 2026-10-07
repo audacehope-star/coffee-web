@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velvet & Bean Co. | Artisanal Coffee & Roastery</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        espresso: '#231B19',
+                        cream: '#FBF9F5',
+                        caramel: '#C68B59',
+                        terracotta: '#A85A32',
+                        sage: '#6D8273',
+                        warmbeige: '#EFECE6'
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .leaflet-container { height: 100%; width: 100%; border-radius: 0.75rem; z-index: 10; }
+    </style>
+</head>
+<body class="bg-cream text-espresso font-sans antialiased selection:bg-caramel selection:text-white">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-espresso text-cream text-xs sm:text-sm text-center py-2 px-4 tracking-wide font-medium">
+        ☕ Free pastry with any seasonal brew order today use code: <span class="underline font-bold text-caramel">MORNINGVIBES</span>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-cream/90 backdrop-blur-md border-b border-warmbeige transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl font-serif font-bold tracking-tight text-espresso">Velvet & Bean<span class="text-terracotta">.</span></span>
+            </div>
+            <nav class="hidden md:flex items-center gap-8 font-medium text-sm">
+                <a href="#menu" class="hover:text-caramel transition-colors">Menu & Order</a>
+                <a href="#story" class="hover:text-caramel transition-colors">Our Craft</a>
+                <a href="#location" class="hover:text-caramel transition-colors">Visit Us</a>
+                <a href="#reviews" class="hover:text-caramel transition-colors">Reviews</a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleDashboard()" class="hidden sm:inline-flex text-xs font-semibold uppercase tracking-wider bg-warmbeige px-3 py-2 rounded-lg hover:bg-caramel hover:text-white transition-all">
+                    Owner Portal 🔒
+                </button>
+                <button onclick="toggleCart()" class="relative bg-espresso text-cream p-3 rounded-full hover:bg-terracotta transition-colors shadow-sm flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    <span id="cart-badge" class="absolute -top-1 -right-1 bg-terracotta text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-cream hidden">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden py-16 lg:py-24 bg-gradient-to-b from-warmbeige/50 to-cream">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="space-y-6 text-center lg:text-left">
+                <span class="inline-block bg-sage/20 text-sage font-bold text-xs uppercase px-3 py-1 rounded-full tracking-widest">Handcrafted Excellence</span>
+                <h1 class="font-serif text-4xl sm:text-6xl font-bold tracking-tight text-espresso leading-[1.1]">
+                    Sip the art of <span class="italic font-normal text-terracotta">conscious</span> roasting.
+                </h1>
+                <p class="text-espresso/70 text-base sm:text-lg max-w-lg mx-auto lg:mx-0">
+                    Sustainably sourced, small-batch artisan coffee roasted daily. Order ahead for lightning-fast pickup right from your phone.
+                </p>
+                <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+                    <a href="#menu" class="w-full sm:w-auto bg-espresso text-cream text-center font-semibold px-8 py-4 rounded-xl hover:bg-terracotta transition-all shadow-lg shadow-espresso/10">
+                        Explore Menu & Order
+                    </a>
+                    <a href="#location" class="w-full sm:w-auto border-2 border-espresso/20 text-espresso text-center font-semibold px-8 py-3.5 rounded-xl hover:border-espresso transition-all">
+                        Find Cafe Location
+                    </a>
+                </div>
+            </div>
+            <div class="relative">
+                <div class="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3] bg-warmbeige">
+                    <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80&w=1000" alt="Specialty Coffee" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-espresso/60 via-transparent to-transparent flex items-end p-6">
+                        <div class="text-white">
+                            <p class="text-xs uppercase tracking-widest text-caramel font-semibold">Flagship Roastery</p>
+                            <p class="font-serif text-xl font-bold">Open Today until 7:00 PM</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Menu & Ordering Section -->
+    <section id="menu" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <h2 class="font-serif text-3xl sm:text-4xl font-bold tracking-tight mb-4">Our Curated Menu</h2>
+            <p class="text-espresso/70">Select items to customize options, choose your milk, and add them instantly to your pickup queue.</p>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="flex flex-wrap justify-center gap-2 mb-12" id="category-tabs">
+            <button onclick="filterMenu('all')" class="category-btn px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-espresso text-cream shadow-sm" data-category="all">All Items</button>
+            <button onclick="filterMenu('Hot Drinks')" class="category-btn px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-warmbeige text-espresso hover:bg-espresso/10" data-category="Hot Drinks">Hot Brews</button>
+            <button onclick="filterMenu('Cold Brews')" class="category-btn px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-warmbeige text-espresso hover:bg-espresso/10" data-category="Cold Brews">Cold Drinks</button>
+            <button onclick="filterMenu('Teas')" class="category-btn px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-warmbeige text-espresso hover:bg-espresso/10" data-category="Teas">Artisanal Teas</button>
+            <button onclick="filterMenu('Food')" class="category-btn px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-warmbeige text-espresso hover:bg-espresso/10" data-category="Food">Bakery & Food</button>
+        </div>
+
+        <!-- Menu Grid -->
+        <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Rendered dynamically by JavaScript -->
+        </div>
+    </section>
+
+    <!-- Store Locator & Map Section -->
+    <section id="location" class="py-20 bg-warmbeige/50 border-y border-warmbeige">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <span class="inline-block bg-terracotta/10 text-terracotta font-bold text-xs uppercase px-3 py-1 rounded-full tracking-widest">Visit the Cafe</span>
+                    <h2 class="font-serif text-3xl sm:text-4xl font-bold tracking-tight">Come smell the fresh roast</h2>
+                    <p class="text-espresso/70">Located in the heart of downtown, our flagship store features ambient seating, high-speed Wi-Fi, and live barista brewing bars.</p>
+                    <div class="space-y-4 pt-2">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-espresso text-cream p-3 rounded-xl">📍</div>
+                            <div>
+                                <h3 class="font-bold text-sm">Address</h3>
+                                <p class="text-espresso/70 text-sm">452 Espresso Boulevard, Suite A, Downtown</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="bg-espresso text-cream p-3 rounded-xl">⏰</div>
+                            <div>
+                                <h3 class="font-bold text-sm">Hours of Operation</h3>
+                                <p class="text-espresso/70 text-sm">Monday – Sunday: 6:30 AM – 7:00 PM</p>
+                                <span class="inline-flex items-center gap-1.5 text-xs font-bold text-sage mt-1">
+                                    <span class="w-2 h-2 rounded-full bg-sage animate-pulse"></span> Open Now
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="h-[400px] bg-white p-2 rounded-2xl shadow-xl border border-warmbeige">
+                    <div id="map"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews Section -->
+    <section id="reviews" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+            <div>
+                <span class="text-caramel font-bold text-xs uppercase tracking-widest">Community Feedback</span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold tracking-tight mt-1">Loved by local coffee lovers</h2>
+            </div>
+            <button onclick="openReviewModal()" class="mt-4 md:mt-0 bg-warmbeige text-espresso font-semibold px-5 py-2.5 rounded-xl hover:bg-espresso hover:text-cream transition-all text-sm">
+                Leave a Review ✨
+            </button>
+        </div>
+
+        <div id="reviews-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Dynamic reviews -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-espresso text-cream py-12 border-t border-espresso/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <span class="font-serif text-xl font-bold tracking-tight">Velvet & Bean<span class="text-terracotta">.</span></span>
+            <p class="text-xs text-cream/60">© 2026 Velvet & Bean Co. All rights reserved. Built for high-end digital commerce.</p>
+            <div class="flex gap-6 text-sm text-cream/80">
+                <a href="#" class="hover:text-caramel transition-colors">Privacy</a>
+                <a href="#" class="hover:text-caramel transition-colors">Terms</a>
+                <a href="#" class="hover:text-caramel transition-colors">Instagram</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Slide-Out Shopping Cart Drawer -->
+    <div id="cart-drawer" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-espresso/50 backdrop-blur-sm transition-opacity" onclick="toggleCart()"></div>
+        <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
+            <div class="w-screen max-w-md bg-cream shadow-2xl flex flex-col">
+                <div class="flex items-center justify-between p-6 border-b border-warmbeige">
+                    <h2 class="font-serif text-xl font-bold">Your Pickup Order</h2>
+                    <button onclick="toggleCart()" class="text-espresso/50 hover:text-espresso p-2 text-xl font-bold">✕</button>
+                </div>
+                
+                <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-4">
+                    <!-- Cart items populated here -->
+                </div>
+
+                <div class="border-t border-warmbeige p-6 space-y-4 bg-white/50">
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between text-espresso/70">
+                            <span>Subtotal</span>
+                            <span id="cart-subtotal">$0.00</span>
+                        </div>
+                        <div class="flex justify-between text-espresso/70">
+                            <span>Estimated Tax (8%)</span>
+                            <span id="cart-tax">$0.00</span>
+                        </div>
+                        <div class="flex justify-between font-bold text-lg text-espresso pt-2 border-t border-warmbeige">
+                            <span>Total Due at Pickup</span>
+                            <span id="cart-total">$0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Customer Info Input Fields for Checkout Submission -->
+                    <div class="space-y-3 pt-2">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-espresso/70 mb-1">Your Name</label>
+                            <input type="text" id="customer-name" placeholder="e.g. Alex Morgan" class="w-full bg-cream border border-warmbeige rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-caramel">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-espresso/70 mb-1">Pickup Time</label>
+                            <select id="pickup-time" class="w-full bg-cream border border-warmbeige rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-caramel">
+                                <option>As soon as possible (~15 mins)</option>
+                                <option>In 30 minutes</option>
+                                <option>In 45 minutes</option>
+                                <option>Specific time (Mention in chat)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Dual Notification Checkout Buttons -->
+                    <div class="space-y-2 pt-2">
+                        <button onclick="submitOrderViaWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm">
+                            <span>📲 Place Order via WhatsApp</span>
+                        </button>
+                        <button onclick="submitOrderViaWeb3Forms()" class="w-full bg-espresso hover:bg-terracotta text-cream font-semibold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
+                            <span>✉️ Send Order via Email (Web3Forms)</span>
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-center text-espresso/50">Choose WhatsApp for instant direct messaging or Email for automated notifications.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Item Customization Modal -->
+    <div id="customize-modal" class="fixed inset-0 z-50 overflow-y-auto hidden flex items-center justify-center p-4">
+        <div class="fixed inset-0 bg-espresso/50 backdrop-blur-sm" onclick="closeCustomizeModal()"></div>
+        <div class="relative bg-cream rounded-2xl max-w-lg w-full p-6 shadow-2xl z-10 space-y-6">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 id="modal-item-title" class="font-serif text-2xl font-bold"></h3>
+                    <p id="modal-item-desc" class="text-sm text-espresso/70 mt-1"></p>
+                </div>
+                <button onclick="closeCustomizeModal()" class="text-espresso/50 hover:text-espresso font-bold text-lg">✕</button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-espresso/70 mb-2">Select Size</label>
+                    <div class="grid grid-cols-3 gap-3" id="size-options">
+                        <label class="border border-warmbeige rounded-xl p-3 text-center cursor-pointer hover:border-caramel transition-all text-sm font-medium">
+                            <input type="radio" name="size" value="Small" class="hidden"> Small
+                        </label>
+                        <label class="border-2 border-caramel bg-caramel/5 rounded-xl p-3 text-center cursor-pointer text-sm font-medium">
+                            <input type="radio" name="size" value="Medium" checked class="hidden"> Medium
+                        </label>
+                        <label class="border border-warmbeige rounded-xl p-3 text-center cursor-pointer hover:border-caramel transition-all text-sm font-medium">
+                            <input type="radio" name="size" value="Large" class="hidden"> Large
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-espresso/70 mb-2">Milk Choice</label>
+                    <select id="milk-choice" class="w-full bg-white border border-warmbeige rounded-xl p-3 text-sm focus:outline-none focus:border-caramel">
+                        <option value="Whole Milk">Whole Milk (Standard)</option>
+                        <option value="Oat Milk">Oat Milk (+ $0.75)</option>
+                        <option value="Almond Milk">Almond Milk (+ $0.75)</option>
+                        <option value="Skim Milk">Skim Milk</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-espresso/70 mb-2">Sweetness Level</label>
+                    <select id="sweetness-choice" class="w-full bg-white border border-warmbeige rounded-xl p-3 text-sm focus:outline-none focus:border-caramel">
+                        <option value="Standard Sweetness">Standard Recipe</option>
+                        <option value="Half Sweet">Half Sweet / Less Syrup</option>
+                        <option value="Unsweetened">Unsweetened / No Syrup</option>
+                    </select>
+                </div>
+            </div>
+
+            <button id="modal-add-btn" class="w-full bg-espresso text-cream font-semibold py-4 rounded-xl hover:bg-terracotta transition-all shadow-md">
+                Add to Cart — <span id="modal-item-price"></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Review Submission Modal -->
+    <div id="review-modal" class="fixed inset-0 z-50 overflow-y-auto hidden flex items-center justify-center p-4">
+        <div class="fixed inset-0 bg-espresso/50 backdrop-blur-sm" onclick="closeReviewModal()"></div>
+        <div class="relative bg-cream rounded-2xl max-w-lg w-full p-6 shadow-2xl z-10 space-y-6">
+            <div class="flex justify-between items-start">
+                <h3 class="font-serif text-2xl font-bold">Write a Customer Review</h3>
+                <button onclick="closeReviewModal()" class="text-espresso/50 hover:text-espresso font-bold text-lg">✕</button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-espresso/70 mb-1">Your Name</label>
+                    <input type="text" id="rev-name" placeholder="Sarah Jenkins" class="w-full bg-white border border-warmbeige rounded-xl p-3 text-sm focus:outline-none focus:border-caramel">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-espresso/70 mb-1">Rating</label>
+                    <select id="rev-rating" class="w-full bg-white border border-warmbeige rounded-xl p-3 text-sm focus:outline-none">
+                        <option value="★★★★★">★★★★★ (5/5 Stars - Exceptional)</option>
+                        <option value="★★★★☆">★★★★☆ (4/5 Stars - Great)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-espresso/70 mb-1">Review Message</label>
+                    <textarea id="rev-text" rows="3" placeholder="The cold brew here is unmatched..." class="w-full bg-white border border-warmbeige rounded-xl p-3 text-sm focus:outline-none focus:border-caramel"></textarea>
+                </div>
+                <button onclick="submitReview()" class="w-full bg-espresso text-cream font-semibold py-3.5 rounded-xl hover:bg-terracotta transition-all">Submit Review</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Owner Dashboard Portal Modal -->
+    <div id="dashboard-modal" class="fixed inset-0 z-50 overflow-y-auto hidden flex items-center justify-center p-4">
+        <div class="fixed inset-0 bg-espresso/50 backdrop-blur-sm" onclick="toggleDashboard()"></div>
+        <div class="relative bg-cream rounded-2xl max-w-2xl w-full p-6 shadow-2xl z-10 space-y-6 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-warmbeige pb-4">
+                <div>
+                    <h3 class="font-serif text-2xl font-bold">Barista Order Portal 🔒</h3>
+                    <p class="text-xs text-espresso/70">Live feed of incoming pickup requests.</p>
+                </div>
+                <button onclick="toggleDashboard()" class="text-espresso/50 hover:text-espresso font-bold text-lg">✕</button>
+            </div>
+            <div id="live-orders-feed" class="space-y-4">
+                <div class="p-4 bg-white rounded-xl border border-warmbeige flex justify-between items-center">
+                    <div>
+                        <span class="text-xs font-bold bg-sage/20 text-sage px-2.5 py-1 rounded-md">Order #1042</span>
+                        <h4 class="font-bold text-sm mt-2">2x Oat Milk Latte, 1x Butter Croissant</h4>
+                        <p class="text-xs text-espresso/60 mt-1">Customer: David Miller • Pickup: As soon as possible</p>
+                    </div>
+                    <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100">Preparing ☕</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS & App Logic -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Menu Dataset
+        const menuItems = [
+            { id: 1, name: "Velvet Signature Latte", category: "Hot Drinks", price: 5.50, description: "Double shot espresso, steamed microfoam oat milk, organic vanilla bean syrup.", image: "https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&q=80&w=600" },
+            { id: 2, name: "Single-Origin Pour Over", category: "Hot Drinks", price: 4.80, description: "Ethopian Yirgacheffe beans brewed precisely with complex floral and citrus tasting notes.", image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=600" },
+            { id: 3, name: "Nitro Cold Brew", category: "Cold Brews", price: 6.00, description: "Steeped for 24 hours, infused with nitrogen for a creamy, velvety stout-like cascade.", image: "https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&q=80&w=600" },
+            { id: 4, name: "Iced Honeycomb Matchaccino", category: "Cold Brews", price: 6.50, description: "Ceremonial grade Uji matcha layered with organic raw honey foam and cold milk.", image: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&q=80&w=600" },
+            { id: 5, name: "Imperial Earl Grey Reserve", category: "Teas", price: 4.50, description: "Bergamot-infused black tea served with steamed lavender milk on the side.", image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&q=80&w=600" },
+            { id: 6, name: "Almond Butter Croissant", category: "Food", price: 4.75, description: "Flaky, buttery French pastry filled with rich almond frangipane cream and sliced almonds.", image: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&q=80&w=600" }
+        ];
+
+        let cart = [];
+        let reviews = [
+            { name: "Marcus Vance", rating: "★★★★★", text: "The nitro cold brew is an absolute game-changer. Clean interface and super easy pickup." },
+            { name: "Elena Rostova", rating: "★★★★★", text: "Ordered through WhatsApp right before walking over and my oat latte was waiting on the counter!" },
+            { name: "Julian Thorne", rating: "★★★★★", text: "Best almond croissants in the entire district. Cozy atmosphere inside too." }
+        ];
+
+        let selectedProduct = null;
+
+        // Initialize Map
+        document.addEventListener("DOMContentLoaded", () => {
+            renderMenu('all');
+            renderReviews();
+            updateCartUI();
+
+            // Leaflet Map Initialization
+            const map = L.map('map').setView([40.7128, -74.0060], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            L.marker([40.7128, -74.0060]).addTo(map)
+                .bindPopup('<b>Velvet & Bean Co.</b><br>452 Espresso Boulevard')
+                .openPopup();
+        });
+
+        // Render Menu Grid
+        function renderMenu(category) {
+            const grid = document.getElementById('menu-grid');
+            grid.innerHTML = '';
+            
+            const filtered = category === 'all' ? menuItems : menuItems.filter(i => i.category === category);
+            
+            filtered.forEach(item => {
+                grid.innerHTML += `
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-warmbeige flex flex-col justify-between hover:shadow-md transition-all">
+                        <div class="relative h-48 overflow-hidden bg-warmbeige">
+                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                            <span class="absolute top-3 right-3 bg-cream/90 backdrop-blur-sm text-espresso text-xs font-bold px-3 py-1 rounded-full">${item.category}</span>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+                            <div>
+                                <h3 class="font-serif text-xl font-bold text-espresso">${item.name}</h3>
+                                <p class="text-espresso/70 text-sm mt-1">${item.description}</p>
+                            </div>
+                            <div class="flex items-center justify-between pt-2">
+                                <span class="font-bold text-lg text-espresso">$${item.price.toFixed(2)}</span>
+                                <button onclick="openCustomizeModal(${item.id})" class="bg-espresso text-cream text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-terracotta transition-colors">
+                                    Customize & Add +
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Update active tabs styling
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                if(btn.dataset.category === category) {
+                    btn.className = "category-btn px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-espresso text-cream shadow-sm";
+                } else {
+                    btn.className = "category-btn px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-warmbeige text-espresso hover:bg-espresso/10";
+                }
+            });
+        }
+
+        function filterMenu(cat) {
+            renderMenu(cat);
+        }
+
+        // Customization Modal Logic
+        function openCustomizeModal(itemId) {
+            selectedProduct = menuItems.find(i => i.id === itemId);
+            document.getElementById('modal-item-title').innerText = selectedProduct.name;
+            document.getElementById('modal-item-desc').innerText = selectedProduct.description;
+            document.getElementById('modal-item-price').innerText = `$${selectedProduct.price.toFixed(2)}`;
+            
+            document.getElementById('modal-add-btn').onclick = () => addToCartFromModal(selectedProduct);
+            document.getElementById('customize-modal').classList.remove('hidden');
+        }
+
+        function closeCustomizeModal() {
+            document.getElementById('customize-modal').classList.add('hidden');
+        }
+
+        function addToCartFromModal(item) {
+            const size = document.querySelector('input[name="size"]:checked')?.value || 'Medium';
+            const milk = document.getElementById('milk-choice').value;
+            const sweetness = document.getElementById('sweetness-choice').value;
+            
+            let finalPrice = item.price;
+            if(milk === 'Oat Milk' || milk === 'Almond Milk') finalPrice += 0.75;
+
+            cart.push({
+                name: item.name,
+                price: finalPrice,
+                options: `${size} • ${milk} • ${sweetness}`,
+                quantity: 1
+            });
+
+            closeCustomizeModal();
+            updateCartUI();
+            toggleCart();
+        }
+
+        // Cart Drawer & Calculations
+        function toggleCart() {
+            const drawer = document.getElementById('cart-drawer');
+            drawer.classList.toggle('hidden');
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items-container');
+            const badge = document.getElementById('cart-badge');
+            
+            if(cart.length > 0) {
+                badge.classList.remove('hidden');
+                badge.innerText = cart.reduce((acc, curr) => acc + curr.quantity, 0);
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            if(cart.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-espresso/50"><p>Your pickup cart is empty.</p></div>`;
+                document.getElementById('cart-subtotal').innerText = '$0.00';
+                document.getElementById('cart-tax').innerText = '$0.00';
+                document.getElementById('cart-total').innerText = '$0.00';
+                return;
+            }
+
+            container.innerHTML = '';
+            let subtotal = 0;
+
+            cart.forEach((item, index) => {
+                subtotal += item.price * item.quantity;
+                container.innerHTML += `
+                    <div class="flex items-center justify-between p-4 bg-white rounded-xl border border-warmbeige">
+                        <div>
+                            <h4 class="font-bold text-sm">${item.name}</h4>
+                            <p class="text-xs text-espresso/60">${item.options}</p>
+                            <p class="text-sm font-semibold text-terracotta mt-1">$${item.price.toFixed(2)}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="updateQty(${index}, -1)" class="w-7 h-7 bg-warmbeige rounded-lg flex items-center justify-center font-bold">-</button>
+                            <span class="text-sm font-bold">${item.quantity}</span>
+                            <button onclick="updateQty(${index}, 1)" class="w-7 h-7 bg-warmbeige rounded-lg flex items-center justify-center font-bold">+</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const tax = subtotal * 0.08;
+            const total = subtotal + tax;
+
+            document.getElementById('cart-subtotal').innerText = `$${subtotal.toFixed(2)}`;
+            document.getElementById('cart-tax').innerText = `$${tax.toFixed(2)}`;
+            document.getElementById('cart-total').innerText = `$${total.toFixed(2)}`;
+        }
+
+        function updateQty(index, change) {
+            cart[index].quantity += change;
+            if(cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCartUI();
+        }
+
+        // Option A: Submit Order via WhatsApp
+        function submitOrderViaWhatsApp() {
+            const name = document.getElementById('customer-name').value.trim();
+            const pickupTime = document.getElementById('pickup-time').value;
+
+            if(!name) {
+                alert('Please enter your name for the order pickup.');
+                document.getElementById('customer-name').focus();
+                return;
+            }
+
+            if(cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            let subtotal = cart.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0);
+            let tax = subtotal * 0.08;
+            let total = subtotal + tax;
+
+            let message = `☕ *NEW PICKUP ORDER - Velvet & Bean Co.*\n\n`;
+            message += `👤 *Customer:* ${name}\n`;
+            message += `⏰ *Pickup Time:* ${pickupTime}\n\n`;
+            message += `🛒 *Items Ordered:*\n`;
+            
+            cart.forEach((item, i) => {
+                message += `${i+1}. ${item.quantity}x ${item.name} (${item.options}) - $${(item.price * item.quantity).toFixed(2)}\n`;
+            });
+
+            message += `\n💰 *Subtotal:* $${subtotal.toFixed(2)}`;
+            message += `\n🧾 *Tax:* $${tax.toFixed(2)}`;
+            message += `\n🌟 *Total Due at Counter:* $${total.toFixed(2)}`;
+            message += `\n\n_Sent via Web Storefront App_`;
+
+            const storePhoneNumber = "15550192834"; 
+            const whatsappUrl = `https://wa.me/${storePhoneNumber}?text=${encodeURIComponent(message)}`;
+            
+            window.open(whatsappUrl, '_blank');
+
+            cart = [];
+            updateCartUI();
+            toggleCart();
+            alert('Order successfully formatted and forwarded to WhatsApp!');
+        }
+
+        // Option B: Submit Order via Web3Forms (Email Notification Endpoint)
+        async function submitOrderViaWeb3Forms() {
+            const name = document.getElementById('customer-name').value.trim();
+            const pickupTime = document.getElementById('pickup-time').value;
+
+            if(!name) {
+                alert('Please enter your name for the order pickup.');
+                document.getElementById('customer-name').focus();
+                return;
+            }
+
+            if(cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            let subtotal = cart.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0);
+            let tax = subtotal * 0.08;
+            let total = subtotal + tax;
+
+            let orderSummaryText = `Customer Name: ${name}\nPickup Time: ${pickupTime}\n\nItems:\n`;
+            cart.forEach((item, i) => {
+                orderSummaryText += `- ${item.quantity}x ${item.name} (${item.options}) [$${(item.price * item.quantity).toFixed(2)}]\n`;
+            });
+            orderSummaryText += `\nTotal Due: $${total.toFixed(2)}`;
+
+            // Web3Forms configuration payload
+            const formData = {
+                access_key: "YOUR-WEB3FORMS-ACCESS-KEY-HERE", // Replace with a free key from web3forms.com
+                subject: `New Coffee Pickup Order from ${name}`,
+                from_name: "Velvet & Bean Web App",
+                message: orderSummaryText
+            };
+
+            try {
+                const response = await fetch("https://api.web3forms.com/submit", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert("Success! Order details sent to store owner's email inbox.");
+                    cart = [];
+                    updateCartUI();
+                    toggleCart();
+                } else {
+                    alert("Submission note: To test live emails, register a free access key at web3forms.com and paste it into the code.");
+                }
+            } catch (error) {
+                alert("Network error. Please check connection or use WhatsApp checkout option.");
+            }
+        }
+
+        // Reviews Render & Submission
+        function renderReviews() {
+            const grid = document.getElementById('reviews-grid');
+            grid.innerHTML = '';
+            reviews.forEach(rev => {
+                grid.innerHTML += `
+                    <div class="p-6 bg-white rounded-2xl border border-warmbeige shadow-sm space-y-4">
+                        <div class="text-caramel text-sm">${rev.rating}</div>
+                        <p class="text-espresso/80 text-sm italic">"${rev.text}"</p>
+                        <p class="font-bold text-xs uppercase tracking-wider text-espresso">— ${rev.name}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function openReviewModal() { document.getElementById('review-modal').classList.remove('hidden'); }
+        function closeReviewModal() { document.getElementById('review-modal').classList.add('hidden'); }
+
+        function submitReview() {
+            const name = document.getElementById('rev-name').value;
+            const rating = document.getElementById('rev-rating').value;
+            const text = document.getElementById('rev-text').value;
+
+            if(!name || !text) { alert('Please fill in all fields.'); return; }
+
+            reviews.unshift({ name, rating, text });
+            renderReviews();
+            closeReviewModal();
+            document.getElementById('rev-name').value = '';
+            document.getElementById('rev-text').value = '';
+        }
+
+        // Dashboard Toggle
+        function toggleDashboard() {
+            document.getElementById('dashboard-modal').classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>
